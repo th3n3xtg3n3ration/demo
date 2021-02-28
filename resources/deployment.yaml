@@ -1,0 +1,28 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: app-deployment
+  namespace: web-app
+  labels:
+    app: web
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: web
+  template:
+    metadata:
+      labels:
+        app: web
+    spec:
+      containers:
+      - name: app
+        image: ahmedatefosman/nginx-app
+        ports:
+        - containerPort: 8083
+        resources:
+          limits:
+            cpu: 300m
+          requests:
+            cpu: 100m
