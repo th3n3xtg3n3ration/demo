@@ -17,7 +17,7 @@ pipeline {
         }
         stage("Deploy to K8s"){
             steps{
-                sh "kubectl apply -f resources/ns.yaml,resources/svc.yaml,resources/deployment.yaml"
+                sh "/usr/local/bin/kubectl apply -f resources/ns.yaml,resources/svc.yaml,resources/deployment.yaml"
             }
         }    
     }
