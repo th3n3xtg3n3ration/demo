@@ -10,7 +10,7 @@ pipeline {
         stage("Docker Push"){
             steps{
                 withCredentials([string(credentialsId: 'docker_pass', variable: 'docker_pass')]) {
-                    sh "docker login -u th3n3xtg3n3ration -p ${docker_pass} "
+                    sh "docker login -u thenextgeneration -p ${docker_pass} "
                 }
                 sh "docker push thenextgeneration/nginx-app"
             }
