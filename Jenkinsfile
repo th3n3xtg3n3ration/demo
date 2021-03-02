@@ -4,7 +4,7 @@ pipeline {
     stages {
         stage ('Docker Build'){
             steps {
-                sh "docker build -t th3n3xtg3n3ration/nginx-app ."
+                sh "docker build -t thenextgeneration/nginx-app ."
             }
         }
         stage("Docker Push"){
@@ -12,7 +12,7 @@ pipeline {
                 withCredentials([string(credentialsId: 'docker_pass', variable: 'docker_pass')]) {
                     sh "docker login -u th3n3xtg3n3ration -p ${docker_pass} "
                 }
-                sh "docker push th3n3xtg3n3ration/nginx-app"
+                sh "docker push thenextgeneration/nginx-app"
             }
         }
         stage("Deploy to K8s"){

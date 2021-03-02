@@ -1,0 +1,116 @@
+# Default values for efk.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+elasticsearch:
+  enabled: true
+  image: "ranchercharts/elasticsearch-elasticsearch"
+  imageTag: "7.3.0"
+  enableProxy: true
+  replicas: 3  ## number of instances in the cluster Aktuell
+  minimumMasterNodes: 2
+  resources: ## Specify the cpu memory here Aktuell
+    requests: ## minimum cpu and ram Aktuell
+      cpu: "100m"
+      memory: "4Gi"
+    limits: ## maximum cpu and ram Aktuell
+      cpu: "8"
+      memory: "16Gi"
+  esJavaOpts: "-Xmx4g -Xms4g" ## heap size for elasticseach normally half of maximum ram size Aktuell
+  service: ## set service type as ClusterIP, NodePort, LoadBalancer for Elasticsearch Aktuell
+    type: NodePort
+  persistence:
+    enabled: true  ## set this value to true to enable PVC Aktuell
+    annotations: {}
+  ## data Persistent Volume Storage Class
+  ## If defined, storageClassName: <storageClass>
+  ## If set to "-", storageClassName: "", which disables dynamic provisioning
+  ## If undefined (the default) or set to null, no storageClassName spec is
+  ##   set, choosing the default provisioner.  (gp2 on AWS, standard on
+  ##   GKE, AWS & OpenStack)
+  ##
+    storageClass: "silver" ## Storage class for elasticseach Aktuell
+  ##
+  ## If you want to reuse an existing claim, you can pass the name of the PVC using
+  ## the existingClaim variable
+  # existingClaim: your-claim
+    accessMode: ReadWriteOnce
+    size: 10Gi ## size of the PVC for each node Aktuell
+
+
+kibana:
+  enabled: true
+  image: "ranchercharts/kibana-kibana"
+  imageTag: "7.3.0"
+  service: ## set service type as ClusterIP, NodePort, LoadBalancer for Elasticsearch Aktuell
+    type: NodePort
+  resources: ## Specify the cpu memory here for kibana Aktuell
+    requests:
+      cpu: "100m"
+      memory: "500m"
+    limits:
+      cpu: "1000m"
+      memory: "1Gi"
+
+fluentd:
+  enabled: false
+  repository: ranchercharts/fluentd-aggregator
+  tag: 1.6.3
+  output:
+    bufferChunkLimit: "2M"
+    bufferQueueLimit: "8"
+    flushInterval: "5s"
+    # options are elasticsearch, syslog, splunk, custom Aktuell
+    type: "elasticsearch"
+    syslogCaFile: ""
+    customConf: ""
+  env:
+    OUTPUT_ES_HOSTS: "elasticsearch-master:9200"
+    OUTPUT_ES_PREFIX: "k8s" ##prefix all logs created by using fluentd Aktuell
+    OUTPUT_ES_DATEFORMAT: "%Y.%m.%d"
+    # OUTPUT_SPLUNK_HOST:
+    # OUTPUT_SPLUNK_PORT:
+    # OUTPUT_SPLUNK_TOKEN:
+    # OUTPUT_SPLUNK_SOURCE_TYPE:
+    # OUTPUT_SPLUNK_INDEX:
+    # OUTPUT_SPLUNK_ACK: false
+    # OUTPUT_SPLUNK_CHANNEL:
+    # OUTPUT_KAFKA_HOST_TYPE: "zookeeper"
+    # OUTPUT_KAFKA_ZK_HOSTS: ""
+    # OUTPUT_KAFKA_BROKER_HOSTS: ""
+    # OUTPUT_KAFKA_TOPIC_KEY: topic
+    # OUTPUT_KAFKA_PARTITION: partition
+    # OUTPUT_KAFKA_PARTITION_KEY: partition_key
+    # OUTPUT_KAFKA_MESSAGE_KEY: message_key
+    # OUTPUT_SYSLOG_PROTOCOL: udp
+    # OUTPUT_SYSLOG_HOST:
+    # OUTPUT_SYSLOG_SEVERITY: notice
+    # OUTPUT_SYSLOG_PROGRAM: fluentd
+    # OUTPUT_SYSLOG_TOKEN:
+  service: ## port type ClusterIP , NodePort , LoadBalancer for fluentd Aktuell
+    type: NodePort
+  resources: ## Resouorce min and max resources for fluentd Aktuell
+    requests:
+      cpu: 100m
+      memory: 200Mi
+    limits:
+      cpu: 1000m
+      memory: 512Mi
+    
+filebeat:
+  enabled: true
+  image: "ranchercharts/beats-filebeat"
+  imageTag: "7.3.0"
+
+metricbeat:
+  enabled: false
+  image: "ranchercharts/beats-metricbeat"
+  imageTag: "7.3.0"
+  kube-state-metrics:
+    image:
+      repository: ranchercharts/coreos-kube-state-metrics
+      tag: v1.7.2
+
+global:
+  nginxProxy:
+    repository: rancher/nginx
+    tag: 1.15.8-alpine
